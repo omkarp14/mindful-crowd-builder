@@ -57,8 +57,8 @@ const Explore: React.FC = () => {
     }
   });
   
-  // Get unique categories from all campaigns
-  const categories = ['all', ...new Set(allCampaigns.map(campaign => campaign.category))];
+  // Get unique categories from all campaigns and ensure they're strings
+  const categories = ['all', ...new Set(allCampaigns.map(campaign => campaign.category))] as string[];
   
   return (
     <div className="flex flex-col min-h-screen">
