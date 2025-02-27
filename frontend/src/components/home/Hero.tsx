@@ -20,7 +20,7 @@ const Hero: React.FC = () => {
                 <span className="text-primary">one vision at a time</span>
               </h1>
               <p className="mt-6 text-lg text-muted-foreground max-w-lg">
-                CrowdBuilder connects visionaries with supporters. Create meaningful campaigns, engage with donors, and make your ideas a reality.
+                HiveFund connects visionaries with supporters. Create meaningful campaigns, engage with donors, and make your ideas a reality.
               </p>
             </div>
 

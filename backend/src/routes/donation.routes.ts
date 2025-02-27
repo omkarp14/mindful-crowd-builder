@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { authenticate } from '../middleware/auth';
+import { authenticate } from '../middleware/auth.middleware';
 import {
     createDonation,
     getDonationsByUser,

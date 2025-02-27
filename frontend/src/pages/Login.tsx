@@ -114,7 +114,7 @@ const Login: React.FC = () => {
             </div>
             <DialogTitle className="text-center text-2xl font-medium">Welcome</DialogTitle>
             <DialogDescription className="text-center text-base">
-              Log in to CrowdBuilder to continue.
+              Log in to HiveFund to continue.
             </DialogDescription>
           </DialogHeader>
           
@@ -170,7 +170,7 @@ const Login: React.FC = () => {
       
       {/* User Information Sheet */}
       <Sheet open={isUserInfoOpen} onOpenChange={setIsUserInfoOpen}>
-        <SheetContent size="sm" onInteractOutside={(e) => e.preventDefault()}>
+        <SheetContent className="sm:max-w-sm" onInteractOutside={(e) => e.preventDefault()}>
           <SheetHeader className="mb-6">
             <SheetTitle>Complete your profile</SheetTitle>
             <SheetDescription>
