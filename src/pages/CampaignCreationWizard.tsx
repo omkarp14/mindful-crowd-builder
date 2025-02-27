@@ -4,628 +4,616 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage, 
-  FormDescription 
-} from "@/components/ui/form";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Loader2, Sparkles, UploadCloud, Wand2 } from 'lucide-react';
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DatePicker } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import {
+  CalendarIcon,
+  Check,
+  ChevronRight,
+  ChevronLeft,
+  Info,
+  Upload,
+  X,
+  PlusCircle,
+  HelpCircle
+} from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import SuggestionGenerator from '@/components/ai/SuggestionGenerator';
+import { supabase } from '@/integrations/supabase/client';
 
-// Popular Campaign Categories
-const campaignCategories = [
-  { value: "animals", label: "Animals & Pets" },
-  { value: "medical", label: "Medical & Health" },
-  { value: "education", label: "Education" },
-  { value: "environment", label: "Environment" },
-  { value: "community", label: "Community & Neighbors" },
-  { value: "emergency", label: "Emergency Relief" },
-  { value: "nonprofit", label: "Nonprofit" },
-  { value: "memorial", label: "Memorial & Funeral" },
-  { value: "sports", label: "Sports & Teams" },
-  { value: "creative", label: "Creative & Arts" },
-];
-
-// Campaign Beneficiary Types
-const beneficiaryTypes = [
-  { value: "self", label: "Myself" },
-  { value: "someone_else", label: "Someone else" },
-  { value: "charity", label: "A charity or organization" },
-];
-
-// Define the campaign schema
-const campaignSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters").max(100, "Title must be less than 100 characters"),
-  category: z.string().min(1, "Please select a category"),
-  goal: z.string().min(1, "Goal amount is required").refine(
-    (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, 
-    "Goal must be a positive number"
-  ),
-  beneficiaryType: z.string().min(1, "Please select who you're raising funds for"),
-  description: z.string().min(20, "Description must be at least 20 characters").max(5000, "Description must be less than 5000 characters"),
-  deadline: z.date({
-    required_error: "Please select a deadline",
-  }).refine((date) => date > new Date(), {
-    message: "Deadline must be in the future",
-  }),
-});
-
-type CampaignFormValues = z.infer<typeof campaignSchema>;
+interface FormData {
+  title: string;
+  description: string;
+  category: string;
+  goal: string;
+  deadline: Date | null;
+  beneficiaryType: string;
+  customBeneficiary: string;
+  tags: string[];
+  newTag: string;
+  image: File | null;
+  imageUrl: string;
+  termsAccepted: boolean;
+}
 
 const CampaignCreationWizard: React.FC = () => {
   const navigate = useNavigate();
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
-  const [totalSteps] = useState(3);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isEnhancing, setIsEnhancing] = useState(false);
-  
-  // Check if user is logged in
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    title: '',
+    description: '',
+    category: '',
+    goal: '',
+    deadline: null,
+    beneficiaryType: 'myself',
+    customBeneficiary: '',
+    tags: [],
+    newTag: '',
+    image: null,
+    imageUrl: '',
+    termsAccepted: false,
+  });
+
+  // Check if user is authenticated
   useEffect(() => {
-    // Simulate auth check - in a real app, you would check your auth state here
-    const checkAuth = () => {
-      const isAuth = localStorage.getItem('isLoggedIn') === 'true';
-      setIsLoggedIn(isAuth);
-      
-      if (!isAuth && currentStep > 1) {
-        setIsLoginOpen(true);
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login', { state: { from: '/create' } });
+        return;
       }
+      setUser(session.user);
     };
     
-    checkAuth();
-  }, [currentStep]);
-  
-  const form = useForm<CampaignFormValues>({
-    resolver: zodResolver(campaignSchema),
-    defaultValues: {
-      title: "",
-      category: "",
-      goal: "",
-      beneficiaryType: "",
-      description: "",
-      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days from now
-    },
-  });
-  
+    checkUser();
+  }, [navigate]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRadioChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddTag = () => {
+    if (formData.newTag.trim() !== '' && !formData.tags.includes(formData.newTag.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...prev.tags, prev.newTag.trim()],
+        newTag: '',
+      }));
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+        imageUrl: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      image: null,
+      imageUrl: '',
+    }));
+  };
+
+  const handleDateChange = (date: Date | undefined) => {
+    setFormData((prev) => ({
+      ...prev,
+      deadline: date || null,
+    }));
+  };
+
+  const validateCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.title.length > 0 && 
+               formData.description.length > 0 && 
+               formData.category.length > 0;
+      case 2:
+        return formData.goal.length > 0 && 
+               formData.deadline !== null && 
+               formData.beneficiaryType.length > 0 &&
+               (formData.beneficiaryType !== 'other' || formData.customBeneficiary.length > 0);
+      case 3:
+        // Step 3 is optional (tags and image)
+        return true;
+      default:
+        return true;
+    }
+  };
+
   const nextStep = () => {
-    if (currentStep === 1) {
-      form.trigger(['goal', 'category', 'deadline']);
-      
-      if (form.formState.errors.goal || form.formState.errors.category || form.formState.errors.deadline) {
-        return;
-      }
-      
-      if (!isLoggedIn) {
-        setIsLoginOpen(true);
-        return;
-      }
-    } else if (currentStep === 2) {
-      form.trigger(['beneficiaryType', 'title', 'description']);
-      
-      if (form.formState.errors.beneficiaryType || 
-          form.formState.errors.title || 
-          form.formState.errors.description) {
-        return;
-      }
+    if (validateCurrentStep()) {
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
+    } else {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields to continue.",
+        variant: "destructive",
+      });
     }
-    
-    setCurrentStep(prev => Math.min(prev + 1, totalSteps));
   };
-  
+
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
-  
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
-  const enhanceWithAI = async () => {
-    const description = form.getValues('description');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    if (!description || description.length < 20) {
-      toast.error("Please enter a longer description first", {
-        description: "Your description should be at least 20 characters to enhance."
+    if (!formData.termsAccepted) {
+      toast({
+        title: "Terms not accepted",
+        description: "Please accept the terms and conditions to create your campaign.",
+        variant: "destructive",
       });
       return;
     }
     
-    setIsEnhancing(true);
-    
-    try {
-      // Simulate AI enhancement delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const enhancedDescription = `${description}\n\nEvery contribution to this campaign makes a real, tangible difference. Your support helps us achieve our goals faster and creates a positive impact that benefits everyone involved. Join us in making this vision a reality - together, we can accomplish amazing things!`;
-      
-      form.setValue('description', enhancedDescription);
-      
-      toast.success("Description enhanced!", {
-        description: "Your campaign description has been enhanced with AI."
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to create a campaign.",
+        variant: "destructive",
       });
-    } catch (error) {
-      toast.error("Enhancement failed", {
-        description: "There was an error enhancing your description. Please try again."
-      });
-    } finally {
-      setIsEnhancing(false);
-    }
-  };
-  
-  const onSubmit = async (values: CampaignFormValues) => {
-    if (currentStep < totalSteps) {
-      nextStep();
+      navigate('/login', { state: { from: '/create' } });
       return;
     }
     
-    setIsSubmitting(true);
+    setLoading(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      let imageUrl = '';
       
-      console.log("Campaign values:", { ...values, image: imagePreview });
+      // If an image was uploaded, store it in Supabase Storage
+      if (formData.image) {
+        const fileExt = formData.image.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        const filePath = `campaign-images/${fileName}`;
+        
+        // Create the bucket if it doesn't exist
+        const { error: bucketError } = await supabase.storage.createBucket('campaign-images', {
+          public: true
+        });
+        
+        if (bucketError && bucketError.message !== 'Bucket already exists') {
+          throw bucketError;
+        }
+        
+        // Upload the file
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('campaign-images')
+          .upload(filePath, formData.image);
+        
+        if (uploadError) throw uploadError;
+        
+        // Get the public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('campaign-images')
+          .getPublicUrl(filePath);
+        
+        imageUrl = publicUrlData.publicUrl;
+      }
       
-      // Show success message
-      toast.success("Campaign created successfully!", {
-        description: "Your campaign has been created and is now live.",
+      // Create the campaign in the database
+      const { data: campaign, error: campaignError } = await supabase
+        .from('campaigns')
+        .insert([
+          {
+            title: formData.title,
+            description: formData.description,
+            category: formData.category,
+            goal: parseFloat(formData.goal),
+            deadline: formData.deadline?.toISOString(),
+            beneficiary_type: formData.beneficiaryType === 'other' ? formData.customBeneficiary : formData.beneficiaryType,
+            image_url: imageUrl,
+            user_id: user.id,
+            is_active: true,
+            // Store tags as metadata
+            metadata: { 
+              tags: formData.tags 
+            }
+          }
+        ])
+        .select()
+        .single();
+      
+      if (campaignError) throw campaignError;
+      
+      toast({
+        title: "Campaign created!",
+        description: "Your campaign has been created successfully.",
       });
       
-      // Redirect to campaign page (mock ID for demonstration)
-      navigate("/campaign/new-campaign-123");
-      
-    } catch (error) {
-      console.error("Campaign creation error:", error);
-      toast.error("Campaign creation failed", {
-        description: "There was an error creating your campaign. Please try again.",
+      // Navigate to the campaign page
+      navigate(`/campaign/${campaign.id}`);
+    } catch (error: any) {
+      console.error('Error creating campaign:', error);
+      toast({
+        title: "Failed to create campaign",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
-  
-  // Render step content based on current step
-  const renderStepContent = () => {
+
+  const categories = [
+    "Medical",
+    "Education",
+    "Emergency",
+    "Environment",
+    "Community",
+    "Business",
+    "Creative",
+    "Animals",
+    "Family",
+    "Sports",
+    "Technology",
+    "Other"
+  ];
+
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Let's start with the basics</h2>
-              <p className="text-muted-foreground">
-                Set your funding goal and select a category for your campaign.
-              </p>
+              <Label htmlFor="title">
+                Campaign Title <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Give your campaign a clear, attention-grabbing title"
+                required
+              />
             </div>
             
-            <FormField
-              control={form.control}
-              name="goal"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>How much do you want to raise?</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500">$</span>
-                      </div>
-                      <Input 
-                        placeholder="5000"
-                        className="pl-7"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    Set a realistic goal. You can always raise more!
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="description">
+                Campaign Description <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Describe your campaign and why people should support it"
+                rows={5}
+                required
+              />
+            </div>
             
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>What are you raising funds for?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {campaignCategories.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Choose the category that best describes your campaign.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="deadline"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Campaign Deadline</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() || date > new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Choose when your campaign will end. Campaigns typically run for 30-60 days.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="category">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleSelectChange('category', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category.toLowerCase()}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         );
-        
+      
       case 2:
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Tell us about your campaign</h2>
-              <p className="text-muted-foreground">
-                Provide details about your campaign and who it's for.
-              </p>
+              <Label htmlFor="goal">
+                Funding Goal ($) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="goal"
+                name="goal"
+                type="number"
+                min="1"
+                step="1"
+                value={formData.goal}
+                onChange={handleInputChange}
+                placeholder="How much do you need to raise?"
+                required
+              />
             </div>
             
-            <FormField
-              control={form.control}
-              name="beneficiaryType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Who are you raising funds for?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select who you're raising for" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {beneficiaryTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <Label>
+                Campaign End Date <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <DatePicker
+                  selected={formData.deadline}
+                  onSelect={handleDateChange}
+                  minDate={new Date()}
+                  maxDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 365)} // Max 1 year from now
+                  className="block w-full"
+                />
+              </div>
+            </div>
             
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Campaign Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter a clear, attention-grabbing title" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is the first thing people will see. Make it catchy and memorable.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+            <div className="space-y-2">
+              <Label>
+                Who is this campaign for? <span className="text-red-500">*</span>
+              </Label>
+              <RadioGroup
+                value={formData.beneficiaryType}
+                onValueChange={(value) => handleRadioChange('beneficiaryType', value)}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="myself" id="myself" />
+                  <Label htmlFor="myself">Myself</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="someone-else" id="someone-else" />
+                  <Label htmlFor="someone-else">Someone else</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="charity" id="charity" />
+                  <Label htmlFor="charity">A charity or nonprofit</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="other" id="other" />
+                  <Label htmlFor="other">Other</Label>
+                </div>
+              </RadioGroup>
+              
+              {formData.beneficiaryType === 'other' && (
+                <div className="mt-2">
+                  <Input
+                    id="customBeneficiary"
+                    name="customBeneficiary"
+                    value={formData.customBeneficiary}
+                    onChange={handleInputChange}
+                    placeholder="Please specify"
+                    required
+                  />
+                </div>
               )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Campaign Description</FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Describe your campaign in detail. What is it for? Why is it important? How will the funds be used?"
-                        className="min-h-[150px] pr-32"
-                        {...field}
-                      />
-                    </FormControl>
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="absolute right-3 bottom-3"
-                      onClick={enhanceWithAI}
-                      disabled={isEnhancing}
-                    >
-                      {isEnhancing ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Enhancing...
-                        </>
-                      ) : (
-                        <>
-                          <Wand2 className="mr-2 h-4 w-4" />
-                          Enhance with AI
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <FormDescription>
-                    Be specific and compelling. Tell your story and explain why people should support your cause.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            </div>
           </div>
         );
-        
+      
       case 3:
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Add a campaign image</h2>
-              <p className="text-muted-foreground">
-                Campaigns with images raise up to 2x more than those without.
-              </p>
-            </div>
-            
-            <div>
-              <FormLabel htmlFor="campaign-image">Campaign Image</FormLabel>
-              <div className="mt-2">
-                <div className="border-2 border-dashed border-input rounded-lg p-6 flex flex-col items-center justify-center">
-                  {imagePreview ? (
-                    <div className="space-y-4 w-full">
-                      <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-                        <img 
-                          src={imagePreview} 
-                          alt="Campaign preview" 
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
+              <Label htmlFor="tags">Tags (Optional)</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="newTag"
+                  name="newTag"
+                  value={formData.newTag}
+                  onChange={handleInputChange}
+                  placeholder="Add a tag"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddTag}
+                  variant="outline"
+                >
+                  Add
+                </Button>
+              </div>
+              {formData.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      {tag}
                       <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setImagePreview(null)}
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-4 w-4 p-0 ml-1"
+                        onClick={() => handleRemoveTag(tag)}
                       >
-                        Remove image
+                        <X className="h-3 w-3" />
                       </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center space-y-2 text-center">
-                      <UploadCloud className="h-10 w-10 text-muted-foreground" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          Drag and drop an image, or click to browse
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          High-quality images increase campaign success by 35%
-                        </p>
-                      </div>
-                      <Input
-                        id="campaign-image"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById("campaign-image")?.click()}
-                      >
-                        Select Image
-                      </Button>
-                    </div>
-                  )}
+                    </Badge>
+                  ))}
                 </div>
-              </div>
-              <div className="mt-2">
-                <FormDescription>
-                  Upload a high-quality image that represents your campaign. Landscape orientation (16:9) works best.
-                </FormDescription>
-              </div>
+              )}
             </div>
             
-            <div className="border rounded-lg p-4 bg-muted/30">
-              <h3 className="font-medium mb-2">Review your campaign</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Goal:</span>
-                  <span className="font-medium">${form.getValues('goal')}</span>
+            <div className="space-y-2">
+              <Label htmlFor="image">Campaign Image (Optional)</Label>
+              {!formData.image ? (
+                <div className="border-2 border-dashed rounded-md p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Upload a compelling image for your campaign
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className="mt-4"
+                  >
+                    Select Image
+                  </Button>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Category:</span>
-                  <span className="font-medium">
-                    {campaignCategories.find(c => c.value === form.getValues('category'))?.label || form.getValues('category')}
-                  </span>
+              ) : (
+                <div className="relative border rounded-md overflow-hidden">
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Campaign preview" 
+                    className="w-full h-64 object-cover" 
+                  />
+                  <div className="absolute top-2 right-2">
+                    <Button 
+                      variant="destructive" 
+                      size="icon"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Beneficiary:</span>
-                  <span className="font-medium">
-                    {beneficiaryTypes.find(b => b.value === form.getValues('beneficiaryType'))?.label || form.getValues('beneficiaryType')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Title:</span>
-                  <span className="font-medium truncate max-w-[60%]">{form.getValues('title')}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Deadline:</span>
-                  <span className="font-medium">
-                    {form.getValues('deadline') ? format(form.getValues('deadline'), "MMM d, yyyy") : "Not set"}
-                  </span>
-                </div>
+              )}
+            </div>
+            
+            <div className="pt-4 border-t">
+              <div className="flex items-start space-x-3">
+                <Checkbox 
+                  id="terms" 
+                  checked={formData.termsAccepted}
+                  onCheckedChange={(checked) => 
+                    setFormData((prev) => ({ 
+                      ...prev, 
+                      termsAccepted: checked === true 
+                    }))
+                  }
+                />
+                <Label htmlFor="terms" className="text-sm">
+                  I agree to the <Button variant="link" className="h-auto p-0">Terms and Conditions</Button> and <Button variant="link" className="h-auto p-0">Privacy Policy</Button>. I confirm that I am raising funds for a lawful purpose and acknowledge that all donations are subject to a 5% platform fee.
+                </Label>
               </div>
             </div>
           </div>
         );
-        
+      
       default:
         return null;
     }
   };
-  
+
+  if (!user) {
+    return null; // Don't render anything while checking auth status
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
       
-      {/* Login Dialog */}
-      {isLoginOpen && (
-        <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center">Sign in required</DialogTitle>
-              <DialogDescription className="text-center">
-                You need to be logged in to create a campaign.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center py-4">
-              <Button onClick={() => navigate('/login', { state: { from: '/create' } })}>
-                Go to login
-              </Button>
+      <main className="flex-grow pt-24 pb-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          {/* Progress indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">
+                Step {currentStep} of 3
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {currentStep === 1 ? 'Basic Info' : currentStep === 2 ? 'Funding Details' : 'Final Touches'}
+              </span>
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
-      
-      <div className="flex-1 container max-w-3xl py-8">
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              size="sm"
-            >
-              Cancel
-            </Button>
-            <div className="text-sm text-muted-foreground">
-              Step {currentStep} of {totalSteps}
-            </div>
+            <Progress value={(currentStep / 3) * 100} className="h-2" />
           </div>
-          <div className="relative">
-            <div className="overflow-hidden h-2 text-xs flex rounded bg-muted">
-              <div
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary transition-all duration-500"
-              ></div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Form */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {renderStepContent()}
-                
-                <div className="flex justify-between pt-4">
-                  {currentStep > 1 ? (
-                    <Button 
-                      type="button" 
-                      variant="outline"
-                      onClick={prevStep}
-                    >
-                      Back
-                    </Button>
-                  ) : (
-                    <div></div>
-                  )}
-                  
-                  <Button 
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {currentStep === totalSteps ? "Creating..." : "Saving..."}
-                      </>
-                    ) : (
-                      currentStep === totalSteps ? "Launch Campaign" : "Continue"
-                    )}
-                  </Button>
-                </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Your Campaign</CardTitle>
+              <CardDescription>
+                Fill in the details to set up your crowdfunding campaign
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent>
+              <form id="campaign-form" onSubmit={handleSubmit}>
+                {renderStep()}
               </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+            
+            <CardFooter className="flex justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+              
+              {currentStep < 3 ? (
+                <Button type="button" onClick={nextStep}>
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                </Button>
+              ) : (
+                <Button 
+                  type="submit" 
+                  form="campaign-form"
+                  disabled={loading || !formData.termsAccepted}
+                >
+                  {loading ? 'Creating...' : 'Create Campaign'}
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+          
+          {currentStep === 1 && (
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="text-base">Need inspiration?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SuggestionGenerator />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </main>
       
       <Footer />
     </div>

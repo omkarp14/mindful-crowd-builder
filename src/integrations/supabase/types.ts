@@ -9,7 +9,158 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      campaigns: {
+        Row: {
+          beneficiary_type: string
+          category: string
+          created_at: string
+          current_amount: number
+          deadline: string
+          description: string
+          goal: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          beneficiary_type: string
+          category: string
+          created_at?: string
+          current_amount?: number
+          deadline: string
+          description: string
+          goal: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          beneficiary_type?: string
+          category?: string
+          created_at?: string
+          current_amount?: number
+          deadline?: string
+          description?: string
+          goal?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      donations: {
+        Row: {
+          amount: number
+          campaign_id: string
+          created_at: string
+          donor_email: string | null
+          donor_name: string | null
+          id: string
+          is_anonymous: boolean
+          message: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id: string
+          created_at?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string
+          created_at?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          card_type: string
+          created_at: string
+          expiry_month: number
+          expiry_year: number
+          id: string
+          is_default: boolean
+          last_four: string
+          user_id: string
+        }
+        Insert: {
+          card_type: string
+          created_at?: string
+          expiry_month: number
+          expiry_year: number
+          id?: string
+          is_default?: boolean
+          last_four: string
+          user_id: string
+        }
+        Update: {
+          card_type?: string
+          created_at?: string
+          expiry_month?: number
+          expiry_year?: number
+          id?: string
+          is_default?: boolean
+          last_four?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          country: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          post_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          post_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          post_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

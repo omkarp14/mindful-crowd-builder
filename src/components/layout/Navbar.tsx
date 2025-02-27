@@ -1,165 +1,354 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Search, User, PlusSquare } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  ChevronDown,
+  Menu,
+  X,
+  PlusCircle,
+  Heart,
+  BarChart,
+  Settings,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useMobile } from "@/hooks/use-mobile";
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/components/ui/use-toast";
 
-const Navbar: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isMobile = useIsMobile();
-  
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const isMobile = useMobile();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  // Handle scroll effect for nav background
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fetch user session and profile data
+  useEffect(() => {
+    const fetchUserSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          setUser(session.user);
+          
+          // Fetch user profile from profiles table
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else {
+            setProfile(profileData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserSession();
+
+    // Set up auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            setUser(session.user);
+            
+            // Fetch user profile
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            setProfile(profileData);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setProfile(null);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account."
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Sign out failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getUserInitials = () => {
+    if (profile?.full_name) {
+      const names = profile.full_name.split(' ');
+      if (names.length >= 2) {
+        return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+      }
+      return profile.full_name.charAt(0).toUpperCase();
+    }
+    
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    
+    return "U";
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const navLinks = [
+    { label: "Home", path: "/" },
+    { label: "Explore", path: "/explore" },
+    { label: "How It Works", path: "/how-it-works" },
+  ];
+
+  const renderNavLinksMobile = () => {
+    return (
+      <>
+        {navLinks.map((link) => (
+          <Link
+            to={link.path}
+            key={link.path}
+            className="block py-2 px-2 rounded hover:bg-secondary"
+            onClick={() => setIsOpen(false)}
+          >
+            {link.label}
+          </Link>
+        ))}
+        {!user ? (
+          <>
+            <Link
+              to="/login"
+              className="block py-2 px-2 rounded hover:bg-secondary mt-4"
+              onClick={() => setIsOpen(false)}
+            >
+              Log In
+            </Link>
+            <Button
+              className="w-full mt-2"
+              onClick={() => {
+                setIsOpen(false);
+                navigate("/create");
+              }}
+            >
+              Start a Campaign
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/dashboard"
+              className="block py-2 px-2 rounded hover:bg-secondary mt-4"
+              onClick={() => setIsOpen(false)}
+            >
+              Dashboard
+            </Link>
+            <Button
+              className="w-full mt-2"
+              onClick={() => {
+                setIsOpen(false);
+                navigate("/create");
+              }}
+            >
+              Start a Campaign
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full mt-2"
+              onClick={() => {
+                handleSignOut();
+                setIsOpen(false);
+              }}
+            >
+              Sign Out
+            </Button>
+          </>
+        )}
+      </>
+    );
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass shadow-soft">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled || location.pathname !== "/"
+          ? "bg-background shadow-md"
+          : "bg-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4 md:py-6">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <span className="text-2xl font-medium tracking-tight">
-                Crowd<span className="text-primary">Builder</span>
-              </span>
-            </Link>
-          </div>
+        <div className="flex justify-between items-center py-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="font-bold text-xl md:text-2xl">CrowdBuilder</span>
+          </Link>
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link 
-                to="/" 
-                className="text-sm font-medium hover:text-primary transition-colors underline-animation"
-              >
-                Home
-              </Link>
-              <Link 
-                to="/explore" 
-                className="text-sm font-medium hover:text-primary transition-colors underline-animation"
-              >
-                Explore
-              </Link>
-              <Link 
-                to="/how-it-works" 
-                className="text-sm font-medium hover:text-primary transition-colors underline-animation"
-              >
-                How It Works
-              </Link>
-              <Link 
-                to="/dashboard" 
-                className="text-sm font-medium hover:text-primary transition-colors underline-animation"
-              >
-                Dashboard
-              </Link>
-            </nav>
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList>
+                {navLinks.map((link) => (
+                  <NavigationMenuItem key={link.path}>
+                    <Link to={link.path}>
+                      <NavigationMenuLink
+                        className={navigationMenuTriggerStyle()}
+                      >
+                        {link.label}
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
           )}
 
-          <div className="flex items-center space-x-4">
-            <Button 
-              asChild 
-              variant="ghost" 
-              size="sm"
-              className="hidden md:flex"
-            >
-              <Link to="/search">
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Link>
-            </Button>
-            <Button 
-              asChild 
-              variant="outline" 
-              size="sm"
-              className="hidden md:flex"
-            >
-              <Link to="/login">
-                <User className="h-4 w-4 mr-2" />
-                Login
-              </Link>
-            </Button>
-            <Button 
-              asChild 
-              size="sm"
-            >
-              <Link to="/create">
-                <PlusSquare className="h-4 w-4 mr-2" />
-                Start Campaign
-              </Link>
-            </Button>
+          {/* Desktop Buttons/User Menu */}
+          {!isMobile && (
+            <div className="hidden md:flex items-center space-x-4">
+              {!loading && !user ? (
+                <>
+                  <Button variant="ghost" onClick={() => navigate("/login")}>
+                    Log In
+                  </Button>
+                  <Button onClick={() => navigate("/create")}>
+                    Start a Campaign
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => navigate("/create")}
+                    className="flex items-center"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Start a Campaign
+                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="p-0 h-10 w-10 rounded-full">
+                        <Avatar>
+                          <AvatarImage src={user?.user_metadata?.avatar_url} />
+                          <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <div className="px-2 py-1.5">
+                        <p className="text-sm font-medium text-foreground">{profile?.full_name || user?.email}</p>
+                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                        <BarChart className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/dashboard?tab=campaigns")}>
+                        <Heart className="h-4 w-4 mr-2" />
+                        My Campaigns
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/dashboard?tab=settings")}>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Account Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignOut}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+          )}
 
-            {/* Mobile menu button */}
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMenu}
-                aria-label="Toggle Menu"
-              >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            )}
-          </div>
+          {/* Mobile Menu Trigger */}
+          {isMobile && (
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="py-4">{renderNavLinksMobile()}</div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {isMobile && isMenuOpen && (
-        <div className="md:hidden glass-dark animate-fade-in">
-          <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
-            <Link 
-              to="/" 
-              className="block px-3 py-3 rounded-md text-base font-medium hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <div className="flex items-center">
-                <Home className="h-5 w-5 mr-3" />
-                Home
-              </div>
-            </Link>
-            <Link 
-              to="/explore" 
-              className="block px-3 py-3 rounded-md text-base font-medium hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <div className="flex items-center">
-                <Search className="h-5 w-5 mr-3" />
-                Explore
-              </div>
-            </Link>
-            <Link 
-              to="/how-it-works" 
-              className="block px-3 py-3 rounded-md text-base font-medium hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <div className="flex items-center">
-                <PlusSquare className="h-5 w-5 mr-3" />
-                How It Works
-              </div>
-            </Link>
-            <Link 
-              to="/dashboard" 
-              className="block px-3 py-3 rounded-md text-base font-medium hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <div className="flex items-center">
-                <User className="h-5 w-5 mr-3" />
-                Dashboard
-              </div>
-            </Link>
-            <Link
-              to="/login"
-              className="block px-3 py-3 rounded-md text-base font-medium hover:bg-secondary/50 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <div className="flex items-center">
-                <User className="h-5 w-5 mr-3" />
-                Login
-              </div>
-            </Link>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
