@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,7 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, UploadCloud, Wand2 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
 // Popular Campaign Categories
@@ -308,7 +307,7 @@ const CampaignCreationWizard: React.FC = () => {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            format(field.value, "MMMM d, yyyy")
                           ) : (
                             <span>Pick a date</span>
                           )}
@@ -321,10 +320,23 @@ const CampaignCreationWizard: React.FC = () => {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() || date > new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-                        }
+                        disabled={(date) => {
+                          // Disable dates before today
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          
+                          // Set maximum date to 60 days from today
+                          const maxDate = new Date();
+                          maxDate.setDate(maxDate.getDate() + 60);
+                          
+                          return date < today || date > maxDate;
+                        }}
                         initialFocus
+                        footer={
+                          <div className="px-4 py-2 text-xs text-muted-foreground">
+                            Campaigns can run for up to 60 days
+                          </div>
+                        }
                       />
                     </PopoverContent>
                   </Popover>
