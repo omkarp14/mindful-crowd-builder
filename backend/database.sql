@@ -42,6 +42,18 @@ CREATE TABLE donations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Honey Matches table
+CREATE TABLE honey_matches (
+    id SERIAL PRIMARY KEY,
+    campaign_id INTEGER REFERENCES campaigns(id),
+    matcher_id INTEGER REFERENCES users(id),
+    match_amount DECIMAL(12,2) NOT NULL,
+    match_deadline TIMESTAMP WITH TIME ZONE NOT NULL,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create updated_at triggers
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -58,5 +70,10 @@ CREATE TRIGGER update_users_updated_at
 
 CREATE TRIGGER update_campaigns_updated_at
     BEFORE UPDATE ON campaigns
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_honey_matches_updated_at
+    BEFORE UPDATE ON honey_matches
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

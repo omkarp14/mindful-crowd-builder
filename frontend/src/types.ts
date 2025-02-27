@@ -1,6 +1,8 @@
 
 // Campaign Types
 export interface Campaign {
+  location: React.ReactNode;
+  imageUrl: string;
   id: string;
   title: string;
   description: string;
@@ -41,6 +43,7 @@ export interface User {
 export interface NavItem {
   title: string;
   path: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: React.ComponentType<any>;
 }
 
