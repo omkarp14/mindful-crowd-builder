@@ -76,6 +76,13 @@ const SuggestionGenerator: React.FC<SuggestionGeneratorProps> = ({ campaign }) =
       setIsGenerating(false);
     }
   };
+
+  const handleSwitchToGenerateTab = () => {
+    const generateTabTrigger = document.querySelector('[data-value="generate"]');
+    if (generateTabTrigger && generateTabTrigger instanceof HTMLElement) {
+      generateTabTrigger.click();
+    }
+  };
   
   return (
     <Card className="w-full">
@@ -129,9 +136,7 @@ const SuggestionGenerator: React.FC<SuggestionGeneratorProps> = ({ campaign }) =
                   <p className="text-muted-foreground mb-4">
                     Generate your first AI-powered suggestion to improve your campaign.
                   </p>
-                  <Button 
-                    onClick={() => document.querySelector('[data-value="generate"]')?.click()}
-                  >
+                  <Button onClick={handleSwitchToGenerateTab}>
                     Generate Suggestions
                   </Button>
                 </div>
