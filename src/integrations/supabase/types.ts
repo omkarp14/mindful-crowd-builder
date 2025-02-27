@@ -131,32 +131,38 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      users: {
         Row: {
-          address: string | null
-          country: string | null
+          address: string
+          country: string
           created_at: string
+          email: string
           full_name: string | null
           id: string
-          post_code: string | null
+          password: string | null
+          post_code: string
           updated_at: string
         }
         Insert: {
-          address?: string | null
-          country?: string | null
+          address: string
+          country: string
           created_at?: string
+          email: string
           full_name?: string | null
-          id: string
-          post_code?: string | null
+          id?: string
+          password?: string | null
+          post_code: string
           updated_at?: string
         }
         Update: {
-          address?: string | null
-          country?: string | null
+          address?: string
+          country?: string
           created_at?: string
+          email?: string
           full_name?: string | null
           id?: string
-          post_code?: string | null
+          password?: string | null
+          post_code?: string
           updated_at?: string
         }
         Relationships: []
