@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,10 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, UploadCloud, Wand2 } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 // Popular Campaign Categories
 const campaignCategories = [
@@ -109,21 +112,16 @@ const CampaignCreationWizard: React.FC = () => {
       category: "",
       goal: "",
       beneficiaryType: "",
-      description: ""
+      description: "",
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days from now
     },
   });
   
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    setIsLoginOpen(false);
-    localStorage.setItem('isLoggedIn', 'true');
-  };
-  
   const nextStep = () => {
     if (currentStep === 1) {
-      form.trigger(['goal', 'category']);
+      form.trigger(['goal', 'category', 'deadline']);
       
-      if (form.formState.errors.goal || form.formState.errors.category) {
+      if (form.formState.errors.goal || form.formState.errors.category || form.formState.errors.deadline) {
         return;
       }
       
@@ -307,7 +305,7 @@ const CampaignCreationWizard: React.FC = () => {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "MMMM d, yyyy")
+                            format(field.value, "PPP")
                           ) : (
                             <span>Pick a date</span>
                           )}
@@ -320,23 +318,10 @@ const CampaignCreationWizard: React.FC = () => {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => {
-                          // Disable dates before today
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          
-                          // Set maximum date to 60 days from today
-                          const maxDate = new Date();
-                          maxDate.setDate(maxDate.getDate() + 60);
-                          
-                          return date < today || date > maxDate;
-                        }}
-                        initialFocus
-                        footer={
-                          <div className="px-4 py-2 text-xs text-muted-foreground">
-                            Campaigns can run for up to 60 days
-                          </div>
+                        disabled={(date) =>
+                          date < new Date() || date > new Date(new Date().setFullYear(new Date().getFullYear() + 1))
                         }
+                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -412,7 +397,7 @@ const CampaignCreationWizard: React.FC = () => {
                     <FormControl>
                       <Textarea 
                         placeholder="Describe your campaign in detail. What is it for? Why is it important? How will the funds be used?"
-                        className="min-h-[150px]"
+                        className="min-h-[150px] pr-32"
                         {...field}
                       />
                     </FormControl>
@@ -538,6 +523,12 @@ const CampaignCreationWizard: React.FC = () => {
                   <span className="text-muted-foreground">Title:</span>
                   <span className="font-medium truncate max-w-[60%]">{form.getValues('title')}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deadline:</span>
+                  <span className="font-medium">
+                    {form.getValues('deadline') ? format(form.getValues('deadline'), "MMM d, yyyy") : "Not set"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -550,6 +541,8 @@ const CampaignCreationWizard: React.FC = () => {
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <Navbar />
+      
       {/* Login Dialog */}
       {isLoginOpen && (
         <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
@@ -569,72 +562,72 @@ const CampaignCreationWizard: React.FC = () => {
         </Dialog>
       )}
       
-      <div className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 sm:py-12">
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate('/')}
-                size="sm"
-              >
-                Cancel
-              </Button>
-              <div className="text-sm text-muted-foreground">
-                Step {currentStep} of {totalSteps}
-              </div>
-            </div>
-            <div className="relative">
-              <div className="overflow-hidden h-2 text-xs flex rounded bg-muted">
-                <div
-                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary transition-all duration-500"
-                ></div>
-              </div>
+      <div className="flex-1 container max-w-3xl py-8">
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')}
+              size="sm"
+            >
+              Cancel
+            </Button>
+            <div className="text-sm text-muted-foreground">
+              Step {currentStep} of {totalSteps}
             </div>
           </div>
-          
-          {/* Form */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-6">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {renderStepContent()}
-                  
-                  <div className="flex justify-between pt-4">
-                    {currentStep > 1 ? (
-                      <Button 
-                        type="button" 
-                        variant="outline"
-                        onClick={prevStep}
-                      >
-                        Back
-                      </Button>
-                    ) : (
-                      <div></div>
-                    )}
-                    
-                    <Button 
-                      type="submit"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {currentStep === totalSteps ? "Creating..." : "Saving..."}
-                        </>
-                      ) : (
-                        currentStep === totalSteps ? "Launch Campaign" : "Continue"
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+          <div className="relative">
+            <div className="overflow-hidden h-2 text-xs flex rounded bg-muted">
+              <div
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary transition-all duration-500"
+              ></div>
+            </div>
+          </div>
         </div>
+        
+        {/* Form */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-6">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {renderStepContent()}
+                
+                <div className="flex justify-between pt-4">
+                  {currentStep > 1 ? (
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={prevStep}
+                    >
+                      Back
+                    </Button>
+                  ) : (
+                    <div></div>
+                  )}
+                  
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {currentStep === totalSteps ? "Creating..." : "Saving..."}
+                      </>
+                    ) : (
+                      currentStep === totalSteps ? "Launch Campaign" : "Continue"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
+      
+      <Footer />
     </div>
   );
 };

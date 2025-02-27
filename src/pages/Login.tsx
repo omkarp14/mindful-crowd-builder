@@ -3,14 +3,16 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import { X, Mail } from "lucide-react";
+import { Mail, X } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 // Define schemas for our forms
 const emailSchema = z.object({
@@ -30,7 +32,6 @@ type UserInfoFormValues = z.infer<typeof userInfoSchema>;
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isAuthOpen, setIsAuthOpen] = useState(true);
   const [isUserInfoOpen, setIsUserInfoOpen] = useState(false);
   const [authMethod, setAuthMethod] = useState<"google" | "email" | null>(null);
   
@@ -55,19 +56,12 @@ const Login: React.FC = () => {
       country: ""
     }
   });
-  
-  const handleClose = () => {
-    setIsAuthOpen(false);
-    // Redirect back to the origin page
-    navigate(-1);
-  };
 
   const handleGoogleLogin = () => {
     console.log("Google login clicked");
     setAuthMethod("google");
     // Simulate Google authentication
     setTimeout(() => {
-      setIsAuthOpen(false);
       setIsUserInfoOpen(true);
     }, 1000);
   };
@@ -80,7 +74,6 @@ const Login: React.FC = () => {
       description: `We've sent a verification link to ${values.email}`,
     });
     setTimeout(() => {
-      setIsAuthOpen(false);
       setIsUserInfoOpen(true);
     }, 1000);
   };
@@ -90,6 +83,9 @@ const Login: React.FC = () => {
     // Simulate saving user information
     setTimeout(() => {
       setIsUserInfoOpen(false);
+      
+      // Set logged in state in localStorage
+      localStorage.setItem('isLoggedIn', 'true');
       
       toast.success("Sign up complete!", {
         description: "Your account has been created successfully.",
@@ -101,30 +97,29 @@ const Login: React.FC = () => {
   };
 
   return (
-    <>
-      {/* Initial Auth Dialog */}
-      <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
-        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
-          <DialogHeader>
-            <div className="absolute right-4 top-4">
-              <Button variant="ghost" size="icon" onClick={handleClose}>
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-            <DialogTitle className="text-center text-2xl font-medium">Welcome</DialogTitle>
-            <DialogDescription className="text-center text-base">
-              Log in to CrowdBuilder to continue.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col space-y-4 py-4">
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      
+      <main className="flex-grow flex items-center justify-center py-16 px-4">
+        <Card className="w-full max-w-md mx-auto">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Welcome to CrowdBuilder</CardTitle>
+            <CardDescription className="text-center">
+              Sign in to your account to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <Button 
               variant="outline" 
               className="w-full"
               onClick={handleGoogleLogin}
             >
-              <img src="/lovable-uploads/511bd267-4eb8-42dd-9194-051ce0d2cb37.png" alt="Google Icon" className="mr-2 h-5 w-5" />
+              <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+              </svg>
               Continue with Google
             </Button>
             
@@ -151,22 +146,20 @@ const Login: React.FC = () => {
                           {...field} 
                         />
                       </FormControl>
-                      <FormMessage className="text-sm text-destructive" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">Continue</Button>
+                <Button type="submit" className="w-full">Continue with Email</Button>
               </form>
             </Form>
             
             <p className="text-xs text-center text-muted-foreground mt-4">
-              This site is protected by reCAPTCHA and the Google{" "}
-              <a href="#" className="underline">Privacy Policy</a> and{" "}
-              <a href="#" className="underline">Terms of Service</a> apply.
+              By continuing, you agree to CrowdBuilder's <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
             </p>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      </main>
       
       {/* User Information Sheet */}
       <Sheet open={isUserInfoOpen} onOpenChange={setIsUserInfoOpen}>
@@ -243,7 +236,9 @@ const Login: React.FC = () => {
           </Form>
         </SheetContent>
       </Sheet>
-    </>
+      
+      <Footer />
+    </div>
   );
 };
 
