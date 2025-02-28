@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hexagon Group -->
+  <g>
+    <!-- Top Hexagons -->
+    <path d="M128 128L192 90L256 128L192 166L128 128Z" fill="#FFD700" stroke="#1E293B" stroke-width="16"/>
+    <path d="M256 128L320 90L384 128L320 166L256 128Z" fill="#FFD700" stroke="#1E293B" stroke-width="16"/>
+    
+    <!-- Bottom Hexagon -->
+    <path d="M192 256L256 218L320 256L256 294L192 256Z" fill="#FFD700" stroke="#1E293B" stroke-width="16"/>
+    
+    <!-- Honey Jar -->
+    <path d="M256 166L288 192V256L256 282L224 256V192L256 166Z" fill="#FFD700" stroke="#1E293B" stroke-width="16"/>
+    <path d="M224 192H288" stroke="#1E293B" stroke-width="12"/>
+    
+    <!-- Connecting Lines -->
+    <path d="M192 128L256 166" stroke="#1E293B" stroke-width="12"/>
+    <path d="M320 128L256 166" stroke="#1E293B" stroke-width="12"/>
+  </g>
+</svg> 

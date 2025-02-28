@@ -18,7 +18,7 @@ const CTASection: React.FC = () => {
             Ready to bring your ideas to life?
           </h2>
           <p className="text-white/80 text-lg mb-8">
-            Join thousands of creators and organizations who have successfully funded their projects with CrowdBuilder.
+            Join thousands of creators and organizations who have successfully funded their projects with HiveFund.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

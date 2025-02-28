@@ -450,7 +450,7 @@ const Dashboard: React.FC = () => {
                   <div className="space-y-4 pt-4 border-t">
                     <h3 className="font-medium">Notification Settings</h3>
                     <p className="text-sm text-muted-foreground">
-                      Control which notifications you receive from CrowdBuilder.
+                      Control which notifications you receive from HiveFund.
                     </p>
                     <Button variant="outline">Manage Notifications</Button>
                   </div>

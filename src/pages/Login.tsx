@@ -103,7 +103,7 @@ const Login: React.FC = () => {
       <main className="flex-grow flex items-center justify-center py-16 px-4">
         <Card className="w-full max-w-md mx-auto">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Welcome to CrowdBuilder</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Welcome to HiveFund</CardTitle>
             <CardDescription className="text-center">
               Sign in to your account to continue
             </CardDescription>
@@ -155,7 +155,7 @@ const Login: React.FC = () => {
             </Form>
             
             <p className="text-xs text-center text-muted-foreground mt-4">
-              By continuing, you agree to CrowdBuilder's <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
+              By continuing, you agree to HiveFund's <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
             </p>
           </CardContent>
         </Card>

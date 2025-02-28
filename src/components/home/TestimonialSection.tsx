@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {
-    quote: "CrowdBuilder helped me raise 150% of my goal in just 3 weeks. The AI suggestions were incredibly helpful for optimizing my campaign strategy.",
+    quote: "HiveFund helped me raise 150% of my goal in just 3 weeks. The AI suggestions were incredibly helpful for optimizing my campaign strategy.",
     author: "Alex Rivera",
     title: "Tech for Education Campaign",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
@@ -42,7 +42,7 @@ const TestimonialSection: React.FC = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold tracking-tight">Success Stories</h2>
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-            Hear from people who have achieved their goals using CrowdBuilder's platform.
+            Hear from people who have achieved their goals using HiveFund's platform.
           </p>
         </div>
         

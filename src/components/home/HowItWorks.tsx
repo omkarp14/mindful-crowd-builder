@@ -34,7 +34,7 @@ const HowItWorks: React.FC = () => {
     <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight">How CrowdBuilder Works</h2>
+          <h2 className="text-3xl font-bold tracking-tight">How HiveFund Works</h2>
           <p className="text-muted-foreground mt-4">
             Our intuitive platform makes it easy to create, share, and manage successful crowdfunding campaigns.
           </p>

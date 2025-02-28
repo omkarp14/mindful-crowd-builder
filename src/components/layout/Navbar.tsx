@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, Search, User, PlusSquare } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import logoImage from '../../assets/images/hivefund-logo.png';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,11 +19,11 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4 md:py-6">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <span className="text-2xl font-medium tracking-tight">
-                Crowd<span className="text-primary">Builder</span>
-              </span>
-            </Link>
+            <img 
+                src={logoImage} 
+                alt="HiveFund Logo" 
+                className="h-16 w-16 mb-4"
+              />
           </div>
 
           {/* Desktop Navigation */}
