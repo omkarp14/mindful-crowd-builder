@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
-
-import colors from 'tailwindcss/colors';
+import animate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -29,20 +28,12 @@ export default {
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',
-					50: '#FFF8E1',
-					100: '#FFECB3',
-					200: '#FFE082',
-					300: '#FFD54F',
-					400: '#FFCA28',
-					500: '#FFC107', // Honey Gold
-					600: '#FFB300',
-					700: '#FFA000',
-					800: '#FF8F00',
-					900: '#FF6F00',
+					gold: '#FFC107', // Honey Gold
 				},
 				secondary: {
+					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))',
-					DEFAULT: '#1E3A5F', // Deep Navy
+					navy: '#1E3A5F', // Deep Navy
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -53,8 +44,9 @@ export default {
 					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
+					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))',
-					DEFAULT: '#3E7C6D', // Forest Green
+					green: '#3E7C6D', // Forest Green
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -64,19 +56,8 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				},
-				charcoal: {
-					DEFAULT: '#333333',
-				}
+				cream: '#FAF3E0', // Soft Cream
+				charcoal: '#333333', // Charcoal Gray
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -136,6 +117,5 @@ export default {
 			},
 		}
 	},
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	plugins: [require("tailwindcss-animate")],
+	plugins: [animate],
 } satisfies Config;

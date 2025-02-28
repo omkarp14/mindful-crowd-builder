@@ -49,16 +49,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow container mx-auto pt-16 px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-serif font-bold text-secondary mb-4">
-            Fund Together. Thrive Together.
-          </h1>
-          <p className="text-lg text-charcoal/80">
-            Join the Hive and help causes thrive in your community.
-          </p>
+      <main className="flex-grow pt-24 md:pt-28">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-12">
+            <h1 className="text-4xl font-serif font-bold text-secondary text-center">
+              Fund Together. Thrive Together.
+            </h1>
+          </div>
+          <Hero />
         </div>
-        <Hero />
 
         <CampaignGrid campaigns={campaigns} />
         <HowItWorks />
@@ -106,7 +105,7 @@ const Index = () => {
         )}
       </main>
       <Footer />
-      </div>
+    </div>
   );
 };
 
