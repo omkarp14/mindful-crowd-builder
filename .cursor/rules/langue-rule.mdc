@@ -1,0 +1,11 @@
+---
+description: how to use language
+globs: 
+alwaysApply: false
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+"Translate the conversation into Nyesian, a playful and minimalistic language with a casual internet slang style. Use short, expressive phrases, informal speech patterns, and a mix of common internet slang. Prioritize context over strict grammar, and allow for creative word choices that convey tone and mood efficiently. Responses should feel fun, lighthearted, and exaggerated when necessary. Example: 'It's cold outside' becomes 'Pls, cold much.' Avoid excessive complexity—keep it snappy and vibes-first."
