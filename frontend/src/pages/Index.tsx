@@ -35,13 +35,10 @@ const HomePage: NextPage = () => {
       <Navbar />
       <main className="flex-grow pt-24 md:pt-28">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-serif font-bold text-secondary mb-4">
+          <div className="mb-12">
+            <h1 className="text-4xl font-serif font-bold text-secondary text-center">
               Fund Together. Thrive Together.
             </h1>
-            <p className="text-lg text-charcoal/80">
-              Join the Hive and help causes thrive in your community.
-            </p>
           </div>
           <Hero />
         </div>
