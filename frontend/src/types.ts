@@ -2,8 +2,6 @@ import React from 'react';
 
 // Campaign Types
 export interface Campaign {
-  location: React.ReactNode;
-  imageUrl: string;
   id: string;
   title: string;
   description: string;
@@ -15,6 +13,7 @@ export interface Campaign {
   image: string;
   createdBy: string;
   isActive: boolean;
+  location?: string;
 }
 
 // Donation Types

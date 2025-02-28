@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -26,18 +25,6 @@ import { format } from 'date-fns';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [isLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
-  
-  // Redirect to login if not logged in
-  React.useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login', { state: { from: '/dashboard' } });
-    }
-  }, [isLoggedIn, navigate]);
-  
-  if (!isLoggedIn) {
-    return null; // Don't render anything while redirecting
-  }
   
   // Get user data and campaigns
   const userData = getUserData();
