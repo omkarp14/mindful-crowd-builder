@@ -25,9 +25,15 @@ const HowItWorks: React.FC = () => {
         {/* Hero Section */}
         <section className="py-12 md:py-20 bg-gradient-to-b from-primary/10 to-background">
           <div className="container mx-auto px-4 text-center">
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
             <h1 className="text-4xl md:text-5xl font-bold mb-6">How CrowdBuilder Works</h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               CrowdBuilder makes it easy to raise money for the causes that matter to you. 
+=======
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">How HiveFund Works</h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              HiveFund makes it easy to raise money for the causes that matter to you. 
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx
               Whether you're fundraising for yourself, a loved one, or a charitable organization,
               we're here to help you succeed.
             </p>
@@ -82,7 +88,11 @@ const HowItWorks: React.FC = () => {
         {/* Benefits Section */}
         <section className="py-12 md:py-16 bg-muted/30">
           <div className="container mx-auto px-4">
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
             <h2 className="text-3xl font-bold text-center mb-12">Why Choose CrowdBuilder?</h2>
+=======
+            <h2 className="text-3xl font-bold text-center mb-12">Why Choose HiveFund?</h2>
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Benefit 1 */}
@@ -131,9 +141,15 @@ const HowItWorks: React.FC = () => {
             
             <div className="max-w-3xl mx-auto space-y-6">
               <div className="space-y-2">
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
                 <h3 className="text-xl font-semibold">How much does it cost to use CrowdBuilder?</h3>
                 <p className="text-muted-foreground">
                   CrowdBuilder charges a small platform fee of 2.9% + $0.30 per donation. This covers payment processing,
+=======
+                <h3 className="text-xl font-semibold">How much does it cost to use HiveFund?</h3>
+                <p className="text-muted-foreground">
+                  HiveFund charges a small platform fee of 2.9% + $0.30 per donation. This covers payment processing,
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx
                   platform maintenance, and customer support. There are no hidden fees or monthly charges.
                 </p>
               </div>
@@ -157,7 +173,11 @@ const HowItWorks: React.FC = () => {
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">What if I don't reach my goal?</h3>
                 <p className="text-muted-foreground">
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
                   No problem! CrowdBuilder uses a "keep what you raise" model, which means you keep all donations
+=======
+                  No problem! HiveFund uses a "keep what you raise" model, which means you keep all donations
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx
                   even if you don't reach your goal. You can also extend your campaign deadline if needed.
                 </p>
               </div>
@@ -178,7 +198,11 @@ const HowItWorks: React.FC = () => {
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Start Your Campaign?</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
               Join thousands of successful fundraisers who have used CrowdBuilder to raise millions of dollars
+=======
+              Join thousands of successful fundraisers who have used HiveFund to raise millions of dollars
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx
               for causes they care about.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -198,4 +222,8 @@ const HowItWorks: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD:src/pages/HowItWorks.tsx
 export default HowItWorks;
+=======
+export default HowItWorks;
+>>>>>>> main:frontend/src/pages/HowItWorks.tsx

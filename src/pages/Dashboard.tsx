@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD:src/pages/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+=======
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
 import { 
   BarChart, 
   Heart, 
@@ -24,6 +32,7 @@ import {
   ChevronRight,
   DollarSign,
   Calendar,
+<<<<<<< HEAD:src/pages/Dashboard.tsx
   CreditCard,
   AlertCircle,
   Home,
@@ -33,10 +42,13 @@ import {
   Mail,
   Lock,
   Bell
+=======
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
 } from 'lucide-react';
 import { ProgressCircle } from "@/components/ui/progress-circle";
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+<<<<<<< HEAD:src/pages/Dashboard.tsx
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -396,6 +408,58 @@ const Dashboard: React.FC = () => {
   const totalDonated = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
   const totalRaised = campaigns.reduce((sum, campaign) => sum + (campaign.current_amount || 0), 0);
   const activeCampaigns = campaigns.filter(c => c.is_active).length;
+=======
+import { getUserData, getAllCampaigns } from '@/data/mockData';
+import { Campaign, Donation } from '@/types';
+import { format } from 'date-fns';
+
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
+  
+  // Redirect to login if not logged in
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login', { state: { from: '/dashboard' } });
+    }
+  }, [isLoggedIn, navigate]);
+  
+  if (!isLoggedIn) {
+    return null; // Don't render anything while redirecting
+  }
+  
+  // Get user data and campaigns
+  const userData = getUserData();
+  const allCampaigns = getAllCampaigns();
+  
+  // Get user campaigns (in a real app, these would be filtered by user id)
+  const userCampaigns = allCampaigns.slice(0, 3);
+  
+  // Get user donations (in a real app, these would be filtered by user id)
+  const userDonations = userCampaigns.flatMap(campaign => 
+    Array(Math.floor(Math.random() * 3) + 1).fill(0).map((_, index) => ({
+      id: `donation-${campaign.id}-${index}`,
+      campaignId: campaign.id,
+      amount: Math.floor(Math.random() * 100) + 10,
+      donorName: userData?.name || "Anonymous",
+      donorEmail: userData?.email || "user@example.com",
+      message: index === 0 ? "Keep up the great work!" : undefined,
+      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+      isAnonymous: false
+    }))
+  );
+  
+  // Calculate totals
+  const totalDonated = userDonations.reduce((sum, donation) => sum + donation.amount, 0);
+  const totalRaised = userCampaigns.reduce((sum, campaign) => sum + campaign.currentAmount, 0);
+  
+  const handleLogout = () => {
+    // Remove logged in state
+    localStorage.removeItem('isLoggedIn');
+    // Navigate to home page
+    navigate('/');
+  };
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -412,7 +476,11 @@ const Dashboard: React.FC = () => {
           </div>
           
           {/* Dashboard Tabs */}
+<<<<<<< HEAD:src/pages/Dashboard.tsx
           <Tabs defaultValue={defaultTab} className="space-y-4">
+=======
+          <Tabs defaultValue="overview" className="space-y-4">
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="campaigns">My Campaigns</TabsTrigger>
@@ -434,7 +502,11 @@ const Dashboard: React.FC = () => {
                   <CardContent>
                     <div className="text-2xl font-bold">${totalDonated}</div>
                     <p className="text-xs text-muted-foreground">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                       Across {donations.length} donations
+=======
+                      Across {userDonations.length} donations
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     </p>
                   </CardContent>
                 </Card>
@@ -449,7 +521,11 @@ const Dashboard: React.FC = () => {
                   <CardContent>
                     <div className="text-2xl font-bold">${totalRaised}</div>
                     <p className="text-xs text-muted-foreground">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                       Across {campaigns.length} campaigns
+=======
+                      Across {userCampaigns.length} campaigns
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     </p>
                   </CardContent>
                 </Card>
@@ -463,10 +539,17 @@ const Dashboard: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                       {activeCampaigns}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Out of {campaigns.length} total campaigns
+=======
+                      {userCampaigns.filter(c => c.isActive).length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Out of {userCampaigns.length} total campaigns
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     </p>
                   </CardContent>
                 </Card>
@@ -482,6 +565,7 @@ const Dashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-8">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                     {donations.slice(0, 5).map((donation, index) => (
                       <div key={donation.id} className="flex items-start space-x-4">
                         <div className="bg-primary/10 p-2 rounded-full">
@@ -509,6 +593,31 @@ const Dashboard: React.FC = () => {
                         <p className="text-muted-foreground">No donation activity yet</p>
                       </div>
                     )}
+=======
+                    {userDonations.slice(0, 5).map((donation, index) => {
+                      const campaign = allCampaigns.find(c => c.id === donation.campaignId);
+                      return (
+                        <div key={index} className="flex items-start space-x-4">
+                          <div className="bg-primary/10 p-2 rounded-full">
+                            <DollarSign className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium">
+                              {index % 2 === 0 ? 'You donated to' : 'Someone donated to'}{' '}
+                              <span className="font-semibold">{campaign?.title}</span>
+                            </p>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Calendar className="mr-1 h-3 w-3" />
+                              <span>{format(new Date(donation.createdAt), 'MMM d, yyyy')}</span>
+                              <span className="mx-2">•</span>
+                              <DollarSign className="mr-1 h-3 w-3" />
+                              <span>${donation.amount}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                   </div>
                 </CardContent>
               </Card>
@@ -545,7 +654,10 @@ const Dashboard: React.FC = () => {
                     <Button 
                       variant="outline" 
                       className="justify-between"
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                       onClick={() => navigate('/dashboard?tab=settings')}
+=======
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     >
                       <div className="flex items-center">
                         <Wallet className="mr-2 h-4 w-4" />
@@ -567,14 +679,23 @@ const Dashboard: React.FC = () => {
                           <User className="h-6 w-6 text-primary" />
                         </div>
                         <div>
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                           <div className="font-medium">{profile?.full_name || user?.email}</div>
                           <div className="text-sm text-muted-foreground">{user?.email}</div>
+=======
+                          <div className="font-medium">{userData?.name || "John Doe"}</div>
+                          <div className="text-sm text-muted-foreground">{userData?.email || "john.doe@example.com"}</div>
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                         </div>
                       </div>
                       
                       <div className="border-t pt-4">
                         <p className="text-sm text-muted-foreground mb-2">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                           Member since {format(new Date(profile?.created_at || user?.created_at || Date.now()), 'MMMM yyyy')}
+=======
+                          Member since {format(new Date(userData?.createdAt || Date.now()), 'MMMM yyyy')}
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                         </p>
                         <Button 
                           variant="outline" 
@@ -604,10 +725,17 @@ const Dashboard: React.FC = () => {
                 </Button>
               </div>
               
+<<<<<<< HEAD:src/pages/Dashboard.tsx
               {campaigns.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4">
                   {campaigns.map((campaign) => {
                     const percentFunded = Math.min(Math.round((campaign.current_amount / campaign.goal) * 100), 100);
+=======
+              {userCampaigns.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {userCampaigns.map((campaign: Campaign) => {
+                    const percentFunded = Math.min(Math.round((campaign.currentAmount / campaign.goal) * 100), 100);
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     const daysLeft = Math.max(0, Math.ceil((new Date(campaign.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
                     
                     return (
@@ -615,7 +743,11 @@ const Dashboard: React.FC = () => {
                         <div className="flex flex-col md:flex-row">
                           <div className="w-full md:w-1/4 aspect-video md:aspect-square relative">
                             <img 
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                               src={campaign.image_url || "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=300&h=300&q=80"}
+=======
+                              src={campaign.image || "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=300&h=300&q=80"}
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                               alt={campaign.title}
                               className="absolute inset-0 w-full h-full object-cover"
                             />
@@ -628,7 +760,11 @@ const Dashboard: React.FC = () => {
                               </p>
                               <div className="flex items-center text-sm text-muted-foreground mb-2">
                                 <Calendar className="mr-2 h-4 w-4" />
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                                 <span>Created on {format(new Date(campaign.created_at), 'MMM d, yyyy')}</span>
+=======
+                                <span>Created on {format(new Date(campaign.createdAt), 'MMM d, yyyy')}</span>
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                               </div>
                               <div className="flex items-center text-sm">
                                 <Clock className="mr-2 h-4 w-4" />
@@ -638,13 +774,21 @@ const Dashboard: React.FC = () => {
                             
                             <div className="mt-4 md:mt-0 md:ml-6 flex flex-col items-center justify-center">
                               <ProgressCircle 
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                                 value={campaign.current_amount} 
+=======
+                                value={campaign.currentAmount} 
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                                 max={campaign.goal} 
                                 size={80}
                                 showLabel={true}
                               />
                               <div className="mt-2 text-center">
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                                 <div className="text-sm font-medium">${campaign.current_amount} raised</div>
+=======
+                                <div className="text-sm font-medium">${campaign.currentAmount} raised</div>
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                                 <div className="text-xs text-muted-foreground">of ${campaign.goal} goal</div>
                               </div>
                             </div>
@@ -690,9 +834,16 @@ const Dashboard: React.FC = () => {
             <TabsContent value="donations" className="space-y-4">
               <h2 className="text-xl font-semibold mb-4">My Donations</h2>
               
+<<<<<<< HEAD:src/pages/Dashboard.tsx
               {donations.length > 0 ? (
                 <div className="space-y-4">
                   {donations.map((donation) => {
+=======
+              {userDonations.length > 0 ? (
+                <div className="space-y-4">
+                  {userDonations.map((donation: Donation) => {
+                    const campaign = allCampaigns.find(c => c.id === donation.campaignId);
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     return (
                       <Card key={donation.id}>
                         <CardContent className="p-6">
@@ -700,11 +851,19 @@ const Dashboard: React.FC = () => {
                             <div>
                               <h3 className="font-medium mb-1">
                                 Donated to{' '}
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                                 <span className="font-semibold">{donation.campaigns?.title || 'a campaign'}</span>
                               </h3>
                               <div className="flex items-center text-sm text-muted-foreground">
                                 <Calendar className="mr-1 h-3 w-3" />
                                 <span>{format(new Date(donation.created_at), 'MMMM d, yyyy')}</span>
+=======
+                                <span className="font-semibold">{campaign?.title}</span>
+                              </h3>
+                              <div className="flex items-center text-sm text-muted-foreground">
+                                <Calendar className="mr-1 h-3 w-3" />
+                                <span>{format(new Date(donation.createdAt), 'MMMM d, yyyy')}</span>
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                               </div>
                               {donation.message && (
                                 <div className="mt-3 text-sm italic">
@@ -717,7 +876,11 @@ const Dashboard: React.FC = () => {
                               <Button 
                                 variant="link" 
                                 className="p-0 h-auto text-sm"
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                                 onClick={() => navigate(`/campaign/${donation.campaign_id}`)}
+=======
+                                onClick={() => navigate(`/campaign/${donation.campaignId}`)}
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                               >
                                 View Campaign
                               </Button>
@@ -748,6 +911,7 @@ const Dashboard: React.FC = () => {
             <TabsContent value="settings" className="space-y-6">
               <Card>
                 <CardHeader>
+<<<<<<< HEAD:src/pages/Dashboard.tsx
                   <CardTitle>Personal Information</CardTitle>
                   <CardDescription>
                     Update your profile information
@@ -808,10 +972,65 @@ const Dashboard: React.FC = () => {
                       disabled={saveLoading}
                     >
                       {saveLoading ? "Saving..." : "Save Changes"}
+=======
+                  <CardTitle>Account Settings</CardTitle>
+                  <CardDescription>
+                    Manage your profile and account preferences.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Personal Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Full Name</label>
+                        <div className="border rounded-md p-3 mt-1">{userData?.name || "John Doe"}</div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Email Address</label>
+                        <div className="border rounded-md p-3 mt-1">{userData?.email || "john.doe@example.com"}</div>
+                      </div>
+                    </div>
+                    <Button variant="outline">Edit Profile</Button>
+                  </div>
+                  
+                  <div className="space-y-4 pt-4 border-t">
+                    <h3 className="font-medium">Payment Methods</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Add or manage your payment methods for donations and withdrawals.
+                    </p>
+                    <Button variant="outline">Manage Payment Methods</Button>
+                  </div>
+                  
+                  <div className="space-y-4 pt-4 border-t">
+                    <h3 className="font-medium">Notification Settings</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Control which notifications you receive from HiveFund.
+                    </p>
+                    <Button variant="outline">Manage Notifications</Button>
+                  </div>
+                  
+                  <div className="space-y-4 pt-4 border-t">
+                    <h3 className="font-medium">Security</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Update your password and security settings.
+                    </p>
+                    <Button variant="outline">Change Password</Button>
+                  </div>
+                  
+                  <div className="pt-6 border-t">
+                    <Button 
+                      variant="destructive"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log Out
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
                     </Button>
                   </div>
                 </CardContent>
               </Card>
+<<<<<<< HEAD:src/pages/Dashboard.tsx
               
               <Card>
                 <CardHeader>
@@ -1082,6 +1301,8 @@ const Dashboard: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
+=======
+>>>>>>> main:frontend/src/pages/Dashboard.tsx
             </TabsContent>
           </Tabs>
         </div>
@@ -1092,4 +1313,8 @@ const Dashboard: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD:src/pages/Dashboard.tsx
 export default Dashboard;
+=======
+export default Dashboard;
+>>>>>>> main:frontend/src/pages/Dashboard.tsx

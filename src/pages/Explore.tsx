@@ -8,7 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Search, Filter } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import CampaignGrid from '@/components/campaign/CampaignGrid';
+import { CampaignGrid } from '@/components/campaign/CampaignGrid';
 import { getAllCampaigns } from '@/data/mockData';
 
 const Explore: React.FC = () => {

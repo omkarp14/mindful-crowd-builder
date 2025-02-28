@@ -172,6 +172,7 @@ export const getSuggestionsByCampaignId = (campaignId: string): CampaignSuggesti
   return mockSuggestions.filter(suggestion => suggestion.campaignId === campaignId);
 };
 
+
 // Add these missing functions
 export const getUserData = (): User => {
   // Return the first mock user for demonstration

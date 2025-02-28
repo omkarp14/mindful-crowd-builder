@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">CrowdBuilder</h3>
+            <h3 className="text-lg font-semibold">HiveFund</h3>
             <p className="text-muted-foreground text-sm">
               Empowering change-makers through innovative crowdfunding solutions.
             </p>
@@ -110,7 +110,7 @@ const Footer: React.FC = () => {
         
         <div className="mt-12 pt-8 border-t border-muted text-center">
           <p className="text-muted-foreground text-sm flex items-center justify-center">
-            Made with <Heart className="h-4 w-4 mx-1 text-destructive" /> by CrowdBuilder Team &copy; {new Date().getFullYear()}
+            Made with <Heart className="h-4 w-4 mx-1 text-destructive" /> by HiveFund Team &copy; {new Date().getFullYear()}
           </p>
         </div>
       </div>
