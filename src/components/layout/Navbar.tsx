@@ -41,11 +41,21 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/components/ui/use-toast";
 
+interface Profile {
+  id: string;
+  full_name: string | null;
+  address: string | null;
+  post_code: string | null;
+  country: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -70,9 +80,9 @@ const Navbar = () => {
         if (session?.user) {
           setUser(session.user);
           
-          // Fetch user profile from users table instead of "profiles"
+          // Fetch user profile from profiles table
           const { data: profileData, error } = await supabase
-            .from('users')
+            .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
@@ -101,7 +111,7 @@ const Navbar = () => {
             
             // Fetch user profile
             const { data: profileData } = await supabase
-              .from('users')
+              .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .single();
