@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -56,22 +55,34 @@ const Login: React.FC = () => {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('http://127.0.0.1:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
       
-      if (error) throw error;
+      const data = await response.json();
       
-      if (data.user) {
-        toast({
-          title: "Logged in successfully!",
-          description: "Welcome back to CrowdBuilder.",
-        });
-        
-        const from = location.state?.from || '/dashboard';
-        navigate(from, { replace: true });
+      if (!response.ok) {
+        throw new Error(data.detail || 'Login failed');
       }
+      
+      // Store the JWT token
+      localStorage.setItem('token', data.access_token);
+      
+      toast({
+        title: "Logged in successfully!",
+        description: "Welcome back to CrowdBuilder.",
+      });
+      
+      const from = location.state?.from || '/dashboard';
+      navigate(from, { replace: true });
+      
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -88,30 +99,48 @@ const Login: React.FC = () => {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
+      console.log('Attempting to register user...');
+      const response = await fetch('http://127.0.0.1:8000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          full_name: fullName,
+          email,
+          password,
+          address: '',  // Default empty values as required by the backend
+          post_code: '',
+          country: '',
+        }),
       });
       
-      if (error) throw error;
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Registration failed');
+      }
       
       toast({
         title: "Sign up successful!",
-        description: "Please check your email to confirm your account.",
+        description: "Please log in with your new account.",
       });
       
-      // For development purposes, we'll go ahead and log the user in
-      // In production, you'd want to wait for email verification
-      if (data.user) {
-        const from = location.state?.from || '/dashboard';
-        navigate(from, { replace: true });
+      // Switch to the login tab
+      const loginTab = document.querySelector('[value="signin"]') as HTMLElement;
+      if (loginTab) {
+        loginTab.click();
       }
+      
+      // Clear the form
+      setFullName('');
+      setEmail('');
+      setPassword('');
+      
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Sign up failed",
         description: error.message || "Please try again with different credentials.",
