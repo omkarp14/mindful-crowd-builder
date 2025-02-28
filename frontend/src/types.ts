@@ -1,3 +1,4 @@
+import React from 'react';
 
 // Campaign Types
 export interface Campaign {
@@ -55,4 +56,45 @@ export interface CampaignSuggestion {
   description: string;
   type: 'content' | 'promotion' | 'audience';
   createdAt: string;
+}
+
+// Leaderboard Types
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  donationAmount: number;
+  gameScore: number;
+  rank: number;
+  title: string; // e.g., "Queen Bee", "Worker Bee", etc.
+  createdAt: string;
+}
+
+// Bee Game Types
+export interface GameScore {
+  id: string;
+  userId: string;
+  score: number;
+  honeyCollected: number;
+  timeSpent: number;
+  createdAt: string;
+}
+
+export interface HoneyDrop {
+  id: string;
+  x: number;
+  y: number;
+  value: number;
+  type: 'regular' | 'golden' | 'rainbow';
+}
+
+export interface GameState {
+  score: number;
+  timeRemaining: number;
+  honeyDrops: HoneyDrop[];
+  isGameActive: boolean;
+  playerPosition: {
+    x: number;
+    y: number;
+  };
 }
