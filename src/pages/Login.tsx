@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -80,9 +81,9 @@ const Login: React.FC = () => {
         description: "Welcome back to CrowdBuilder.",
       });
       
+      // Redirect to the proper route
       const from = location.state?.from || '/dashboard';
       navigate(from, { replace: true });
-      
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -128,16 +129,8 @@ const Login: React.FC = () => {
         description: "Please log in with your new account.",
       });
       
-      // Switch to the login tab
-      const loginTab = document.querySelector('[value="signin"]') as HTMLElement;
-      if (loginTab) {
-        loginTab.click();
-      }
-      
-      // Clear the form
-      setFullName('');
-      setEmail('');
-      setPassword('');
+      // Automatically log the user in after successful registration
+      await handleSignIn(e);
       
     } catch (error: any) {
       console.error('Registration error:', error);

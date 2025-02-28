@@ -1,63 +1,66 @@
 
 import React from 'react';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface ProgressCircleProps {
   value: number;
   max: number;
   size?: number;
   strokeWidth?: number;
-  className?: string;
   showLabel?: boolean;
+  className?: string;
 }
 
 export function ProgressCircle({
   value,
   max,
-  size = 120,
-  strokeWidth = 8,
+  size = 100,
+  strokeWidth = 10,
+  showLabel = false,
   className,
-  showLabel = true,
 }: ProgressCircleProps) {
   const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = value / max;
-  const strokeDashoffset = circumference * (1 - progress);
+  const circumference = radius * 2 * Math.PI;
+  const percent = Math.min(100, Math.round((value / max) * 100));
+  const offset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className={cn("relative inline-flex items-center justify-center", className)}>
+    <div className={cn("relative", className)} style={{ width: size, height: size }}>
       <svg
-        className="transform -rotate-90"
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
+        className="transform -rotate-90"
       >
+        {/* Background circle */}
         <circle
-          className="text-muted"
           cx={size / 2}
           cy={size / 2}
           r={radius}
+          fill="none"
           strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
+          className="stroke-muted"
         />
+        
+        {/* Progress circle */}
         <circle
-          className="text-primary transition-all duration-500 ease-out"
           cx={size / 2}
           cy={size / 2}
           r={radius}
+          fill="none"
           strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
+          strokeDashoffset={offset}
+          className="stroke-primary"
           strokeLinecap="round"
         />
       </svg>
+      
       {showLabel && (
-        <div className="absolute inset-0 flex items-center justify-center flex-col">
-          <span className="text-lg font-medium">{Math.round(progress * 100)}%</span>
-          <span className="text-xs text-muted-foreground">{value}/{max}</span>
+        <div className="absolute inset-0 flex items-center justify-center text-center">
+          <div>
+            <span className="text-lg font-bold">{percent}%</span>
+          </div>
         </div>
       )}
     </div>
