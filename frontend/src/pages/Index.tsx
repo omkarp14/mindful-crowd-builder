@@ -1,9 +1,5 @@
-
 import React, { useState } from 'react';
-
-import { NextPage } from 'next';
 import { CampaignGrid } from '@/components/campaign/CampaignGrid';
-
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
@@ -11,13 +7,12 @@ import FeaturedCampaigns from '@/components/home/FeaturedCampaigns';
 import HowItWorks from '@/components/home/HowItWorks';
 import TestimonialSection from '@/components/home/TestimonialSection';
 import CTASection from '@/components/home/CTASection';
-
 import { mockCampaigns } from '@/data/mockData';
 import BeeGame from './game/BeeGame';
 import Leaderboard from './game/Leaderboard';
 import DonationGame from './game/DonationGame';
 
-const Index = () => {
+const Index: React.FC = () => {
   const [showDonationGame, setShowDonationGame] = useState(false);
   const [currentDonation, setCurrentDonation] = useState({
     amount: 0,
@@ -27,7 +22,6 @@ const Index = () => {
 
   const handleGameComplete = (score: number) => {
     console.log(`Game completed with score: ${score}`);
-    // TODO: Handle game completion, maybe show a celebration modal
     setShowDonationGame(false);
   };
 
@@ -35,7 +29,6 @@ const Index = () => {
     setShowDonationGame(false);
   };
 
-  // Add this function to simulate a donation
   const handleTestGame = () => {
     setCurrentDonation({
       amount: 100,
@@ -44,7 +37,6 @@ const Index = () => {
     });
     setShowDonationGame(true);
   };
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,7 +51,7 @@ const Index = () => {
           <Hero />
         </div>
 
-        <CampaignGrid campaigns={campaigns} />
+        <CampaignGrid campaigns={mockCampaigns} />
         <HowItWorks />
         <TestimonialSection />
         <CTASection />
@@ -70,7 +62,6 @@ const Index = () => {
             <h2 className="text-4xl font-bold text-center text-amber-800 mb-8">
               Hive Heroes Leaderboard 🐝
             </h2>
-            {/* Add test button */}
             <div className="text-center mb-8">
               <button
                 onClick={handleTestGame}
@@ -109,4 +100,4 @@ const Index = () => {
   );
 };
 
-export default HomePage;
+export default Index;
