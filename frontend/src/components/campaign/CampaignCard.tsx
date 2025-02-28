@@ -17,16 +17,11 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign }) => {
   const timeLeft = formatDistanceToNow(new Date(campaign.deadline), { addSuffix: true });
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="group relative"
-    >
-      <div className="relative overflow-hidden rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow">
-        {/* Campaign Image with Hexagonal Overlay */}
-        <div className="relative aspect-video">
-          <img
-            src={campaign.imageUrl}
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
+      <Link to={`/campaign/${campaign.id}`}>
+        <div className="relative h-48 overflow-hidden">
+          <img 
+            src={campaign.image}
             alt={campaign.title}
             className="w-full h-full object-cover"
           />

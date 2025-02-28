@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -111,7 +110,7 @@ const CampaignDetails = () => {
             <div className="md:col-span-2 space-y-6">
               <div className="rounded-xl overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1593113598332-cd288d649433?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
+                  src={campaign.image}
                   alt={campaign.title}
                   className="w-full h-auto aspect-video object-cover"
                 />
