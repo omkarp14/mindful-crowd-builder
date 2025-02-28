@@ -142,6 +142,31 @@
   .input {
     @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
+
+  /* Calendar and Popover Styles */
+  .rdp {
+    margin: 0;
+  }
+
+  /* Hide any stray calendar elements */
+  .rdp:not([data-radix-popper-content-wrapper] *) {
+    display: none !important;
+  }
+
+  [data-radix-popper-content-wrapper] {
+    @apply relative z-50 !important;
+  }
+
+  /* Ensure popovers are properly contained */
+  [role="dialog"][aria-label="Calendar"] {
+    position: absolute;
+    z-index: 50;
+  }
+
+  /* Hide any floating calendars */
+  .rdp:not([aria-label="Calendar"]) {
+    display: none !important;
+  }
 }
 
 @layer utilities {
