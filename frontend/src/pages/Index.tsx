@@ -1,4 +1,9 @@
+
 import React, { useState } from 'react';
+
+import { NextPage } from 'next';
+import { CampaignGrid } from '@/components/campaign/CampaignGrid';
+
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
@@ -6,6 +11,7 @@ import FeaturedCampaigns from '@/components/home/FeaturedCampaigns';
 import HowItWorks from '@/components/home/HowItWorks';
 import TestimonialSection from '@/components/home/TestimonialSection';
 import CTASection from '@/components/home/CTASection';
+
 import { mockCampaigns } from '@/data/mockData';
 import BeeGame from './game/BeeGame';
 import Leaderboard from './game/Leaderboard';
@@ -39,12 +45,22 @@ const Index = () => {
     setShowDonationGame(true);
   };
 
+
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow pt-16">
+      <main className="flex-grow container mx-auto pt-16 px-4 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-serif font-bold text-secondary mb-4">
+            Fund Together. Thrive Together.
+          </h1>
+          <p className="text-lg text-charcoal/80">
+            Join the Hive and help causes thrive in your community.
+          </p>
+        </div>
         <Hero />
-        <FeaturedCampaigns campaigns={mockCampaigns} />
+
+        <CampaignGrid campaigns={campaigns} />
         <HowItWorks />
         <TestimonialSection />
         <CTASection />
@@ -90,8 +106,8 @@ const Index = () => {
         )}
       </main>
       <Footer />
-    </div>
+      </div>
   );
 };
 
-export default Index;
+export default HomePage;

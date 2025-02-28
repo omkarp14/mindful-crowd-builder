@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <span className="text-2xl font-medium tracking-tight">
-                Crowd<span className="text-primary">Builder</span>
+                Hive<span className="text-primary">Fund</span>
               </span>
             </Link>
           </div>

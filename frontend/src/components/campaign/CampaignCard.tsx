@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -6,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Users } from 'lucide-react';
 import { Campaign } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+import { Hexagon } from '../ui/Hexagon';
+import { motion } from 'framer-motion';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -16,63 +17,60 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign }) => {
   const timeLeft = formatDistanceToNow(new Date(campaign.deadline), { addSuffix: true });
   
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
-      <Link to={`/campaign/${campaign.id}`}>
-        <div className="relative h-48 overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1593113598332-cd288d649433?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80" 
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group relative"
+    >
+      <div className="relative overflow-hidden rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow">
+        {/* Campaign Image with Hexagonal Overlay */}
+        <div className="relative aspect-video">
+          <img
+            src={campaign.imageUrl}
             alt={campaign.title}
-            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute top-3 left-3">
-            <Badge variant="secondary" className="shadow-soft">
-              {campaign.category}
-            </Badge>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         </div>
-      </Link>
-      
-      <CardContent className="pt-4 pb-2">
-        <h3 className="text-lg font-semibold line-clamp-1 mb-2 group-hover:text-primary transition-colors">
-          <Link to={`/campaign/${campaign.id}`}>
-            {campaign.title}
-          </Link>
-        </h3>
-        <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
-          {campaign.description}
-        </p>
-        
-        <div className="mt-4 space-y-3">
-          <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-            <div 
-              className="bg-primary h-full rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${percentFunded}%` }}
-            ></div>
+
+        {/* Campaign Info */}
+        <div className="p-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-serif text-xl font-bold text-secondary">
+                {campaign.title}
+              </h3>
+              <p className="text-sm text-charcoal/60 flex items-center gap-1">
+                <span>📍</span> {campaign.location}
+              </p>
+            </div>
+            <Hexagon className="w-16" progress={percentFunded}>
+              <span className="text-xs font-bold">
+                {Math.round(percentFunded)}%
+              </span>
+            </Hexagon>
           </div>
-          
-          <div className="flex justify-between items-center">
-            <div className="text-sm">
+
+          <p className="mt-2 text-sm text-charcoal/80 line-clamp-2">
+            {campaign.description}
+          </p>
+
+          {/* Progress and Stats */}
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between text-sm">
               <span className="font-semibold">${campaign.currentAmount.toLocaleString()}</span>
-              <span className="text-muted-foreground"> raised of ${campaign.goal.toLocaleString()}</span>
+              <span className="text-charcoal/60">of ${campaign.goal.toLocaleString()}</span>
             </div>
-            <div className="text-sm font-medium">
-              {percentFunded}%
+            <div className="flex justify-between text-xs text-charcoal/60">
+              <span>{timeLeft}</span>
+              <span className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full">
+                {campaign.category}
+              </span>
             </div>
           </div>
         </div>
-      </CardContent>
-      
-      <CardFooter className="border-t pt-3 pb-3 flex justify-between text-sm text-muted-foreground">
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 mr-1" />
-          <span>{timeLeft}</span>
-        </div>
-        <div className="flex items-center">
-          <Users className="h-4 w-4 mr-1" />
-          <span>{(campaign.currentAmount / 50).toFixed(0)} donors</span>
-        </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </motion.div>
   );
 };
 

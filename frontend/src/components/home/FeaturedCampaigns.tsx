@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import CampaignGrid from '../campaign/CampaignGrid';
+import { CampaignGrid } from '../campaign/CampaignGrid';
 import { Campaign } from '@/types';
 import { ArrowRight } from 'lucide-react';
 
