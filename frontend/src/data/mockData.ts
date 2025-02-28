@@ -1,5 +1,10 @@
-
 import { Campaign, Donation, User, CampaignSuggestion } from '../types';
+
+// Import campaign images
+import cleanWaterImg from '../assets/CleanWater.webp';
+import educationForAllImg from '../assets/EducationForAll.webp';
+import wildlifeProtectionImg from '../assets/WildlifeProtection.webp';
+import techForSeniorsImg from '../assets/TechForSeniors.webp';
 
 // Mock campaigns data
 export const mockCampaigns: Campaign[] = [
@@ -12,7 +17,7 @@ export const mockCampaigns: Campaign[] = [
     currentAmount: 27500,
     createdAt: '2023-06-15T08:00:00Z',
     deadline: '2023-12-31T23:59:59Z',
-    image: '/images/campaign1.jpg',
+    image: cleanWaterImg,
     createdBy: 'user1',
     isActive: true,
   },
@@ -25,7 +30,7 @@ export const mockCampaigns: Campaign[] = [
     currentAmount: 12000,
     createdAt: '2023-07-01T10:15:00Z',
     deadline: '2023-11-30T23:59:59Z',
-    image: '/images/campaign2.jpg',
+    image: educationForAllImg,
     createdBy: 'user2',
     isActive: true,
   },
@@ -38,7 +43,7 @@ export const mockCampaigns: Campaign[] = [
     currentAmount: 45000,
     createdAt: '2023-05-20T09:30:00Z',
     deadline: '2024-01-15T23:59:59Z',
-    image: '/images/campaign3.jpg',
+    image: wildlifeProtectionImg,
     createdBy: 'user3',
     isActive: true,
   },
@@ -51,7 +56,7 @@ export const mockCampaigns: Campaign[] = [
     currentAmount: 8000,
     createdAt: '2023-08-10T11:45:00Z',
     deadline: '2024-02-28T23:59:59Z',
-    image: '/images/campaign4.jpg',
+    image: techForSeniorsImg,
     createdBy: 'user1',
     isActive: true,
   },
