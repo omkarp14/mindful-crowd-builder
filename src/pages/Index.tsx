@@ -71,7 +71,7 @@ const Index = () => {
         deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days from now
         beneficiary_type: "animal shelter",
         image_url: "https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=1000&auto=format&fit=crop",
-        user_id: "system", // You'll need to replace this with a valid user_id
+        user_id: "system", // This will be replaced with a valid user_id
         is_active: true,
         current_amount: 1200
       },
@@ -83,7 +83,7 @@ const Index = () => {
         deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 45).toISOString(), // 45 days from now
         beneficiary_type: "animal rescue",
         image_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=1000&auto=format&fit=crop",
-        user_id: "system", // You'll need to replace this with a valid user_id
+        user_id: "system", // This will be replaced with a valid user_id
         is_active: true,
         current_amount: 850
       },
@@ -95,7 +95,7 @@ const Index = () => {
         deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60).toISOString(), // 60 days from now
         beneficiary_type: "pet owner",
         image_url: "https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?q=80&w=1000&auto=format&fit=crop",
-        user_id: "system", // You'll need to replace this with a valid user_id
+        user_id: "system", // This will be replaced with a valid user_id
         is_active: true,
         current_amount: 2300
       }
@@ -103,8 +103,8 @@ const Index = () => {
     
     try {
       // Get a valid user ID
-      const { data: session } = await supabase.auth.getSession();
-      let userId = session?.user?.id;
+      const { data } = await supabase.auth.getSession();
+      let userId = data?.session?.user?.id;
       
       if (!userId) {
         // If no logged in user, get first user from the database
@@ -120,14 +120,14 @@ const Index = () => {
         user_id: userId
       }));
       
-      const { data, error } = await supabase
+      const { data: newCampaigns, error } = await supabase
         .from('campaigns')
         .insert(dogCampaigns)
         .select();
       
       if (error) throw error;
       
-      setDogCampaigns(data || []);
+      setDogCampaigns(newCampaigns || []);
     } catch (error) {
       console.error('Error creating dog campaigns:', error);
     }

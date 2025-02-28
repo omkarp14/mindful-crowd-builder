@@ -70,9 +70,9 @@ const Navbar = () => {
         if (session?.user) {
           setUser(session.user);
           
-          // Fetch user profile from profiles table
+          // Fetch user profile from users table instead of "profiles"
           const { data: profileData, error } = await supabase
-            .from('profiles')
+            .from('users')
             .select('*')
             .eq('id', session.user.id)
             .single();
@@ -101,7 +101,7 @@ const Navbar = () => {
             
             // Fetch user profile
             const { data: profileData } = await supabase
-              .from('profiles')
+              .from('users')
               .select('*')
               .eq('id', session.user.id)
               .single();

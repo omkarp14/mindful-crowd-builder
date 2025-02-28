@@ -93,7 +93,7 @@ const Dashboard: React.FC = () => {
       // Fetch user profile data
       try {
         const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', session.user.id)
           .single();
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
     
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({
           full_name: profileForm.fullName,
           address: profileForm.address,
@@ -222,7 +222,7 @@ const Dashboard: React.FC = () => {
       
       // Refresh profile data
       const { data } = await supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', user.id)
         .single();
