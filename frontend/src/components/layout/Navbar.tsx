@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, Search, User, PlusSquare } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import Logo from '@/assets/Logo.png';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,9 +19,7 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center py-4 md:py-6">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-medium tracking-tight">
-                Crowd<span className="text-primary">Builder</span>
-              </span>
+              <img src={Logo} alt="HiveFund" className="h-12 w-auto" />
             </Link>
           </div>
 

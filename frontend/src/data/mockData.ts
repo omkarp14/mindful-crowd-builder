@@ -176,3 +176,13 @@ export const getDonationsByCampaignId = (campaignId: string): Donation[] => {
 export const getSuggestionsByCampaignId = (campaignId: string): CampaignSuggestion[] => {
   return mockSuggestions.filter(suggestion => suggestion.campaignId === campaignId);
 };
+
+// Add these missing functions
+export const getUserData = (): User => {
+  // Return the first mock user for demonstration
+  return mockUsers[0];
+};
+
+export const getAllCampaigns = (): Campaign[] => {
+  return mockCampaigns;
+};

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CampaignGrid } from '@/components/campaign/CampaignGrid';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
@@ -11,7 +12,7 @@ import BeeGame from './game/BeeGame';
 import Leaderboard from './game/Leaderboard';
 import DonationGame from './game/DonationGame';
 
-const Index = () => {
+const Index: React.FC = () => {
   const [showDonationGame, setShowDonationGame] = useState(false);
   const [currentDonation, setCurrentDonation] = useState({
     amount: 0,
@@ -21,7 +22,6 @@ const Index = () => {
 
   const handleGameComplete = (score: number) => {
     console.log(`Game completed with score: ${score}`);
-    // TODO: Handle game completion, maybe show a celebration modal
     setShowDonationGame(false);
   };
 
@@ -29,7 +29,6 @@ const Index = () => {
     setShowDonationGame(false);
   };
 
-  // Add this function to simulate a donation
   const handleTestGame = () => {
     setCurrentDonation({
       amount: 100,
@@ -40,11 +39,19 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow pt-16">
-        <Hero />
-        <FeaturedCampaigns campaigns={mockCampaigns} />
+      <main className="flex-grow pt-24 md:pt-28">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-12">
+            <h1 className="text-4xl font-serif font-bold text-secondary text-center">
+              Fund Together. Thrive Together.
+            </h1>
+          </div>
+          <Hero />
+        </div>
+
+        <CampaignGrid campaigns={mockCampaigns} />
         <HowItWorks />
         <TestimonialSection />
         <CTASection />
@@ -55,7 +62,6 @@ const Index = () => {
             <h2 className="text-4xl font-bold text-center text-amber-800 mb-8">
               Hive Heroes Leaderboard 🐝
             </h2>
-            {/* Add test button */}
             <div className="text-center mb-8">
               <button
                 onClick={handleTestGame}
